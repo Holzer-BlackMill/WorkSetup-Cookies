@@ -1,7 +1,10 @@
 (function () {
   console.log("Cookie script loaded");
 
-  const overlay = document.getElementById("cookieOverlay");
+function getOverlay() {
+  return document.getElementById('cookieOverlay');
+}
+
 
   function showOverlay() {
     overlay.style.display = "flex";
