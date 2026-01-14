@@ -1,2 +1,2 @@
 # WorkSetup Cookies
-2-Teiliger Cookiesbaner
+2-Teiliger Cookiebaner
