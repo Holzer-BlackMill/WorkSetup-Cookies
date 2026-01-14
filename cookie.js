@@ -5,7 +5,7 @@
   const defaultConsent = {
     necessary: true,
     affiliate: true,
-    analytics: false
+    analytics: true
   };
 
   function getConsent() {
@@ -41,7 +41,8 @@
 
   function showLayer(layer) {
     document.querySelectorAll(".cookie-layer").forEach(l => l.style.display = "none");
-    document.getElementById("cookie-" + layer).style.display = "block";
+    const target = document.getElementById("cookie-" + layer);
+    if (target) target.style.display = "block";
   }
 
   function updateAffiliateLinks() {
@@ -51,6 +52,7 @@
         link.href = link.dataset.href;
         link.textContent = link.dataset.label || "Buy now";
         link.classList.remove("cookie-button");
+        link.onclick = null;
       } else {
         link.href = "#";
         link.textContent = "Enable cookies to view";
@@ -69,7 +71,8 @@
     const html = `
     <div id="cookieOverlay">
       <div id="cookieBanner">
-        
+
+        <!-- MAIN LAYER -->
         <div id="cookie-main" class="cookie-layer">
           <h2>Privacy & Cookies</h2>
           <p>We use cookies to track affiliate referrals and improve this website. You can accept all cookies or adjust your preferences.</p>
@@ -78,10 +81,11 @@
           <button id="acceptMain" class="primary">Accept</button>
         </div>
 
+        <!-- SETTINGS LAYER -->
         <div id="cookie-settings" class="cookie-layer">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <h2>Cookie Settings</h2>
-            <span id="rejectAll" class="link">Reject all</span>
+            <span id="declineAll" class="link">Decline all</span>
           </div>
 
           <div class="cookie-option">
@@ -89,22 +93,24 @@
           </div>
 
           <div class="cookie-option">
-            <label><input type="checkbox" id="affiliateBox" checked> Affiliate tracking</label>
+            <label><input type="checkbox" id="affiliateBox" checked> Affiliate cookies</label>
           </div>
 
           <div class="cookie-option">
-            <label><input type="checkbox" id="analyticsBox"> Analytics</label>
+            <label><input type="checkbox" id="analyticsBox" checked> Analytics</label>
           </div>
 
           <div class="cookie-footer">
             <button id="saveSettings">Save</button>
             <button id="acceptAll" class="primary">Accept all</button>
           </div>
+
         </div>
 
       </div>
     </div>
     `;
+
     document.body.insertAdjacentHTML("beforeend", html);
   }
 
@@ -121,7 +127,7 @@
     #cookieBanner {
       background:white;
       padding:28px;
-      max-width:420px;
+      max-width:450px;
       width:90%;
       border-radius:14px;
       font-family:Arial,sans-serif;
@@ -138,37 +144,12 @@
       margin:5px;
       cursor:pointer;
     }
-    .primary {
-      background:#0070f3;
-      color:white;
-    }
-    .link {
-      text-decoration:underline;
-      cursor:pointer;
-      font-size:13px;
-      color:#666;
-    }
-    .cookie-option {
-      margin:10px 0;
-      font-size:14px;
-    }
-    .cookie-footer {
-      margin-top:20px;
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-    }
-    .cookie-button {
-      background:#0070f3;
-      color:white;
-      padding:6px 12px;
-      border-radius:4px;
-      text-decoration:none;
-    }
-    body.cookie-blocked > *:not(#cookieOverlay) {
-      pointer-events:none;
-      user-select:none;
-    }
+    .primary { background:#0070f3; color:white; }
+    .link { text-decoration:underline; cursor:pointer; font-size:13px; color:#666; }
+    .cookie-option { margin:10px 0; font-size:14px; }
+    .cookie-footer { margin-top:20px; display:flex; justify-content:flex-end; gap:10px; }
+    .cookie-button { background:#0070f3; color:white; padding:6px 12px; border-radius:4px; text-decoration:none; }
+    body.cookie-blocked > *:not(#cookieOverlay) { pointer-events:none; user-select:none; }
     `;
     const s = document.createElement("style");
     s.innerHTML = css;
@@ -176,14 +157,17 @@
   }
 
   function bindEvents() {
+    // Navigation
     document.getElementById("openSettings").onclick = () => showLayer("settings");
 
+    // Main Accept
     document.getElementById("acceptMain").onclick = () => {
       setConsent({ ...defaultConsent });
       hideOverlay();
       updateAffiliateLinks();
     };
 
+    // Settings Buttons
     document.getElementById("acceptAll").onclick = () => {
       setConsent({ necessary:true, affiliate:true, analytics:true });
       hideOverlay();
@@ -200,7 +184,8 @@
       updateAffiliateLinks();
     };
 
-    document.getElementById("rejectAll").onclick = () => {
+    // Decline all oben rechts
+    document.getElementById("declineAll").onclick = () => {
       setConsent({ necessary:true, affiliate:false, analytics:false });
       hideOverlay();
       updateAffiliateLinks();
