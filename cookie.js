@@ -11,10 +11,16 @@ function getOverlay() {
     document.body.classList.add("cookie-blocked");
   }
 
-  function hideOverlay() {
-    overlay.style.display = "none";
-    document.body.classList.remove("cookie-blocked");
+function showOverlay() {
+  const overlay = getOverlay();
+  if (!overlay) {
+    console.warn("cookieOverlay not found");
+    return;
   }
+  overlay.style.display = 'flex';
+  document.body.classList.add('cookie-blocked');
+}
+
 
   function updateAffiliateLinks() {
     const consent = localStorage.getItem("affiliateConsent");
