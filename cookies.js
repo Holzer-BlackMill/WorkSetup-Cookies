@@ -194,6 +194,7 @@ function acceptAll() {
 }
 
 
+
     function saveCustom() {
       saveConsent({
         essential: true,
@@ -210,8 +211,20 @@ function rejectAll() {
     state[cb.dataset.cookie] = false
   })
   setCookieState(state)
+  applyStateToUI() // optional, aber sauber
 }
 
+function saveSettings() {
+  const state = {}
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    state[cb.dataset.cookie] = cb.checked
+  })
+  setCookieState(state)
+  hideOverlay()
+}
+
+
+    
 function applyStateToUI() {
   const state = getCookieState()
   document.querySelectorAll("[data-cookie]").forEach(cb => {
@@ -219,6 +232,10 @@ function applyStateToUI() {
   })
 }
 
+window.manageCookies = function () {
+  showOverlay()
+  applyStateToUI()
+}
 
 
     
