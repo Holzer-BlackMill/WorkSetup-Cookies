@@ -183,6 +183,15 @@
       blockPage(false);
     }
 
+function getCookieState() {
+  try {
+    return JSON.parse(localStorage.getItem("cookieState")) || {}
+  } catch {
+    return {}
+  }
+}
+
+    
 function acceptAll() {
   const state = {}
 
