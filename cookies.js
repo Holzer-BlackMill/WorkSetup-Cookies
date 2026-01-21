@@ -212,6 +212,16 @@ function rejectAll() {
   setCookieState(state)
 }
 
+function applyStateToUI() {
+  const state = getCookieState()
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = state[cb.dataset.cookie] !== false
+  })
+}
+
+
+
+    
 
     /* EVENTS */
     qs("cw-accept").onclick = acceptAll;
