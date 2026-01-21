@@ -266,6 +266,7 @@ window.manageCookies = function () {
     qs("cw-settings").onclick = () => {
       main.style.display = "none";
       settings.style.display = "block";
+      applyStateToUI();
     };
     qs("cw-save").onclick = saveCustom;
     qs("cw-accept-all").onclick = acceptAll;
