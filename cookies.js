@@ -243,6 +243,7 @@ function applyStateToUI() {
   })
 }
 
+
 window.manageCookies = function () {
   showOverlay()
   applyStateToUI()
