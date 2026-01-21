@@ -1,5 +1,85 @@
-<!-- ========= WORKSETUP COOKIE WALL ========= -->
-<style>
+/* ========= SIMPLE COOKIE WALL – WORKSETUP ========= */
+(function () {
+  const CONSENT_KEY = "cookieConsent_v1";
+
+  /* ---------- HELPERS ---------- */
+  function qs(id) {
+    return document.getElementById(id);
+  }
+
+  function saveConsent(data) {
+    localStorage.setItem(CONSENT_KEY, JSON.stringify(data));
+  }
+
+  function getConsent() {
+    try {
+      return JSON.parse(localStorage.getItem(CONSENT_KEY));
+    } catch {
+      return null;
+    }
+  }
+
+  function blockPage(block) {
+    document.body.style.overflow = block ? "hidden" : "";
+  }
+
+  /* ---------- HTML ---------- */
+  const html = `
+<div id="cw-overlay">
+  <div id="cw-box">
+
+    <!-- LAYER 1 -->
+    <div id="cw-main">
+      <h2>Privacy & Cookies</h2>
+      <p>
+        We use cookies to enable affiliate tracking and basic analytics.
+        No personal data is sold.
+        <br><br>
+        <a href="/privacy-policy" target="_blank">Privacy Policy</a>
+      </p>
+
+      <div class="cw-actions">
+        <button id="cw-settings" class="cw-btn gray">Settings</button>
+        <button id="cw-accept" class="cw-btn blue">Accept</button>
+      </div>
+    </div>
+
+    <!-- LAYER 2 -->
+    <div id="cw-settings-layer" style="display:none;">
+      <div class="cw-header">
+        <h2>Cookie Settings</h2>
+        <span id="cw-reject-all">Reject all</span>
+      </div>
+
+      <div class="cw-list">
+        <label>
+          <input type="checkbox" checked disabled>
+          Essential cookies (required)
+        </label>
+
+        <label>
+          <input type="checkbox" id="c-affiliate" checked>
+          Affiliate tracking cookies
+        </label>
+
+        <label>
+          <input type="checkbox" id="c-analytics" checked>
+          Analytics cookies
+        </label>
+      </div>
+
+      <div class="cw-actions">
+        <button id="cw-save" class="cw-btn gray">Save</button>
+        <button id="cw-accept-all" class="cw-btn blue">Accept all</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+`;
+
+  /* ---------- CSS ---------- */
+  const css = `
 #cw-overlay {
   position: fixed;
   inset: 0;
@@ -19,137 +99,183 @@
   padding: 24px;
 }
 
-#cw-box h2 { margin:0 0 10px; font-size:20px; }
-#cw-box p { font-size:14px; color:#444; }
-#cw-box a { color:#0070f3; text-decoration:underline; }
+#cw-box h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
 
-.cw-actions { display:flex; justify-content:space-between; margin-top:20px; }
-.cw-btn { padding:10px 18px; border-radius:6px; border:none; cursor:pointer; font-size:14px; }
-.cw-btn.blue { background:#0070f3; color:#fff; }
-.cw-btn.gray { background:#e5e5e5; color:#111; }
+#cw-box p {
+  font-size: 14px;
+  color: #444;
+}
 
-.cw-header { display:flex; justify-content:space-between; align-items:center; }
-#cw-reject-all { font-size:13px; color:#777; text-decoration:underline; cursor:pointer; }
-.cw-list { margin-top:15px; }
-.cw-list label { display:block; margin-bottom:10px; font-size:14px; }
-</style>
+#cw-box a {
+  color: #0070f3;
+  text-decoration: underline;
+}
 
-<div id="cw-overlay">
-  <div id="cw-box">
+.cw-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 
-    <!-- LAYER 1 -->
-    <div id="cw-main">
-      <h2>Privacy & Cookies</h2>
-      <p>
-        We use cookies to enable affiliate tracking and basic analytics.
-        No personal data is sold.
-        <br><br>
-        <a href="/privacy-policy" target="_blank">Privacy Policy</a>
-      </p>
-      <div class="cw-actions">
-        <button id="cw-settings" class="cw-btn gray">Settings</button>
-        <button id="cw-accept" class="cw-btn blue">Accept</button>
-      </div>
-    </div>
+.cw-btn {
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
 
-    <!-- LAYER 2 -->
-    <div id="cw-settings-layer" style="display:none;">
-      <div class="cw-header">
-        <h2>Cookie Settings</h2>
-        <span id="cw-reject-all">Reject all</span>
-      </div>
+.cw-btn.blue {
+  background: #0070f3;
+  color: #fff;
+}
 
-      <div class="cw-list">
-        <label>
-          <input type="checkbox" checked disabled data-cookie="essential">
-          Essential cookies (required)
-        </label>
+.cw-btn.gray {
+  background: #e5e5e5;
+  color: #111;
+}
 
-        <label>
-          <input type="checkbox" id="c-affiliate" checked data-cookie="affiliate">
-          Affiliate tracking cookies
-        </label>
+.cw-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-        <label>
-          <input type="checkbox" id="c-analytics" checked data-cookie="analytics">
-          Analytics cookies
-        </label>
-      </div>
+#cw-reject-all {
+  font-size: 13px;
+  color: #777;
+  text-decoration: underline;
+  cursor: pointer;
+}
 
-      <div class="cw-actions">
-        <button id="cw-save" class="cw-btn gray">Save</button>
-        <button id="cw-accept-all" class="cw-btn blue">Accept all</button>
-      </div>
-    </div>
+.cw-list {
+  margin-top: 15px;
+}
 
-  </div>
-</div>
+.cw-list label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+`;
 
-<script>
-(function() {
-  const CONSENT_KEY = "cookieConsent_v1";
+  /* ---------- INSERT ---------- */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.insertAdjacentHTML("beforeend", html);
+    const style = document.createElement("style");
+    style.textContent = css;
+    document.head.appendChild(style);
 
-  function qs(id){return document.getElementById(id);}
-  function show(){qs("cw-overlay").style.display="flex"; document.body.style.overflow="hidden";}
-  function hide(){qs("cw-overlay").style.display="none"; document.body.style.overflow="";}
+    const overlay = qs("cw-overlay");
+    const main = qs("cw-main");
+    const settings = qs("cw-settings-layer");
 
-  function getConsent(){try{return JSON.parse(localStorage.getItem(CONSENT_KEY))||{}}catch{return{}}}
-  function saveConsent(data){localStorage.setItem(CONSENT_KEY, JSON.stringify(data));}
-
-  function getCookieState(){try{return JSON.parse(localStorage.getItem("cookieState"))||{}}catch{return{}}}
-  function setCookieState(state){localStorage.setItem("cookieState", JSON.stringify(state))}
-
-  function applyStateToUI(){
-    const state=getCookieState();
-    document.querySelectorAll("[data-cookie]").forEach(cb=>{cb.checked=state[cb.dataset.cookie]!==false})
-  }
-
-  function acceptAll(){
-    const state={}
-    document.querySelectorAll("[data-cookie]").forEach(cb=>{cb.checked=true; state[cb.dataset.cookie]=true})
-    setCookieState(state)
-    saveConsent(state)
-    hide()
-  }
-
-  function rejectAll(){
-    const state={}
-    document.querySelectorAll("[data-cookie]").forEach(cb=>{if(!cb.disabled){cb.checked=false; state[cb.dataset.cookie]=false}})
-    setCookieState(state)
-    saveConsent(state)
-    applyStateToUI()
-  }
-
-  function saveSettings(){
-    const state={}
-    document.querySelectorAll("[data-cookie]").forEach(cb=>{state[cb.dataset.cookie]=cb.checked})
-    setCookieState(state)
-    saveConsent(state)
-    hide()
-  }
-
-  document.addEventListener("DOMContentLoaded",()=>{
-    const overlay=qs("cw-overlay");
-    const main=qs("cw-main");
-    const settings=qs("cw-settings-layer");
-
-    qs("cw-accept").onclick=acceptAll;
-    qs("cw-settings").onclick=()=>{
-      main.style.display="none";
-      settings.style.display="block";
-      applyStateToUI();
-    }
-    qs("cw-save").onclick=saveSettings;
-    qs("cw-accept-all").onclick=acceptAll;
-    qs("cw-reject-all").onclick=rejectAll;
-
-    window.manageCookies=function(){
-      show();
-      applyStateToUI();
+    function show() {
+      overlay.style.display = "flex";
+      blockPage(true);
     }
 
-    if(Object.keys(getConsent()).length===0) show();
-    applyStateToUI();
+    function hide() {
+      overlay.style.display = "none";
+      blockPage(false);
+    }
+
+function getCookieState() {
+  try {
+    return JSON.parse(localStorage.getItem("cookieState")) || {}
+  } catch {
+    return {}
+  }
+}
+
+    
+function acceptAll() {
+  const state = {}
+
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = true
+    state[cb.dataset.cookie] = true
+  })
+
+  setCookieState(state)
+  applyStateToUI()
+  hideOverlay()
+}
+
+
+
+    function saveCustom() {
+      saveConsent({
+        essential: true,
+        affiliate: qs("c-affiliate").checked,
+        analytics: qs("c-analytics").checked,
+      });
+      hide();
+    }
+
+function rejectAll() {
+  const state = {}
+
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = false
+    state[cb.dataset.cookie] = false
+  })
+
+  setCookieState(state)
+  applyStateToUI()
+}
+
+
+    
+function saveSettings() {
+  const state = {}
+
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    state[cb.dataset.cookie] = cb.checked
+  })
+
+  setCookieState(state)
+  hideOverlay()
+}
+
+
+
+    
+function applyStateToUI() {
+  const state = getCookieState()
+
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = state[cb.dataset.cookie] === true
+  })
+}
+
+
+window.manageCookies = function () {
+  showOverlay()
+  applyStateToUI()
+}
+
+
+    
+
+    /* EVENTS */
+    qs("cw-accept").onclick = acceptAll;
+    qs("cw-settings").onclick = () => {
+      main.style.display = "none";
+      settings.style.display = "block";
+      applyStateToUI();
+    };
+    qs("cw-save").onclick = saveCustom;
+    qs("cw-accept-all").onclick = acceptAll;
+    qs("cw-reject-all").onclick = rejectAll;
+
+    /* PUBLIC */
+    window.manageCookies = show;
+
+    /* INIT */
+    if (!getConsent()) show();
   });
 })();
-</script>
