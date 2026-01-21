@@ -183,14 +183,16 @@
       blockPage(false);
     }
 
-    function acceptAll() {
-      saveConsent({
-        essential: true,
-        affiliate: true,
-        analytics: true,
-      });
-      hide();
-    }
+function acceptAll() {
+  const state = {}
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = true
+    state[cb.dataset.cookie] = true
+  })
+  setCookieState(state)
+  hideOverlay()
+}
+
 
     function saveCustom() {
       saveConsent({
@@ -201,14 +203,15 @@
       hide();
     }
 
-    function rejectAll() {
-      saveConsent({
-        essential: true,
-        affiliate: false,
-        analytics: false,
-      });
-      hide();
-    }
+function rejectAll() {
+  const state = {}
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = false
+    state[cb.dataset.cookie] = false
+  })
+  setCookieState(state)
+}
+
 
     /* EVENTS */
     qs("cw-accept").onclick = acceptAll;
