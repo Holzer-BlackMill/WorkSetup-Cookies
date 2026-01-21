@@ -185,11 +185,14 @@
 
 function acceptAll() {
   const state = {}
+
   document.querySelectorAll("[data-cookie]").forEach(cb => {
     cb.checked = true
     state[cb.dataset.cookie] = true
   })
+
   setCookieState(state)
+  applyStateToUI()
   hideOverlay()
 }
 
@@ -206,29 +209,37 @@ function acceptAll() {
 
 function rejectAll() {
   const state = {}
+
   document.querySelectorAll("[data-cookie]").forEach(cb => {
     cb.checked = false
     state[cb.dataset.cookie] = false
   })
+
   setCookieState(state)
-  applyStateToUI() // optional, aber sauber
+  applyStateToUI()
 }
 
+
+    
 function saveSettings() {
   const state = {}
+
   document.querySelectorAll("[data-cookie]").forEach(cb => {
     state[cb.dataset.cookie] = cb.checked
   })
+
   setCookieState(state)
   hideOverlay()
 }
 
 
+
     
 function applyStateToUI() {
   const state = getCookieState()
+
   document.querySelectorAll("[data-cookie]").forEach(cb => {
-    cb.checked = state[cb.dataset.cookie] !== false
+    cb.checked = state[cb.dataset.cookie] === true
   })
 }
 
