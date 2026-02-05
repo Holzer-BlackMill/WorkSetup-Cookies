@@ -135,6 +135,25 @@ window.setCookieState = function(state) {
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+    // initial Cookie-State setzen, falls noch nicht vorhanden
+    if (!localStorage.getItem("cookieState")) {
+        localStorage.setItem("cookieState", JSON.stringify({
+            affiliate: false,
+            analytics: false
+        }))
+    }
+})
+
+
+    window.getCookieState = function() {
+    try { return JSON.parse(localStorage.getItem("cookieState")) || {} } 
+    catch { return {} }
+}
+
+window.setCookieState = function(state) {
+    localStorage.setItem("cookieState", JSON.stringify(state))
+}
 
     
     // EVENTS
