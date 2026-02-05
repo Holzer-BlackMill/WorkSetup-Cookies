@@ -123,6 +123,20 @@
       applyStateToUI();
     }
 
+// Global, damit Overrides darauf zugreifen können
+window.getCookieState = function() {
+    try { return JSON.parse(localStorage.getItem("cookieState")) || {}; }
+    catch { return {}; }
+}
+
+window.setCookieState = function(state) {
+    localStorage.setItem("cookieState", JSON.stringify(state));
+    if(window.applyStateToUI) window.applyStateToUI();
+}
+
+
+
+    
     // EVENTS
     qs("cw-accept").onclick = acceptAll;
     qs("cw-settings").onclick = ()=>{ main.style.display="none"; settings.style.display="block"; applyStateToUI(); };
