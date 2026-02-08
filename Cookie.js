@@ -8,7 +8,12 @@
 
   /* ---------- HTML ---------- */
 
-<p id="cw-block-msg" style="display:none; font-size:13px; color:#b00020; margin-bottom:10px;">
+<p id="cw-affiliate-blocked" style="
+  display:none;
+  font-size:13px;
+  color:#b00020;
+  margin-bottom:10px;
+">
   Redirection was blocked because affiliate cookies are not enabled.
 </p>
 
@@ -129,19 +134,25 @@ function saveSettings() {
   localStorage.setItem(CONSENT_KEY, "true"); // 🔴 WICHTIG
   hideOverlay();
 }
-
+  window.clearAffiliateBlockedMessage();
+  hideOverlay();
+}
+                           
 function acceptAll() {
   const state = {};
   document.querySelectorAll("[data-cookie]").forEach(cb => {
     cb.checked = true;
     state[cb.dataset.cookie] = true;
+    
   });
 
   window.setCookieState(state);
   localStorage.setItem(CONSENT_KEY, "true"); // 🔴 WICHTIG
   hideOverlay();
 }
-
+  window.clearAffiliateBlockedMessage();
+  hideOverlay();
+}
 
     function rejectAll() {
       const state = {};
@@ -161,13 +172,17 @@ function acceptAll() {
     qs("cw-reject-all").onclick = rejectAll;
 
     window.manageCookies = showOverlay;
+window.showAffiliateBlockedMessage = function () {
+  const el = document.getElementById("cw-affiliate-blocked");
+  if (el) el.style.display = "block";
+};
+
+window.clearAffiliateBlockedMessage = function () {
+  const el = document.getElementById("cw-affiliate-blocked");
+  if (el) el.style.display = "none";
+};
 
     if (!localStorage.getItem(CONSENT_KEY)) showOverlay();
-
-   window.showAffiliateBlockedMessage = function () {
-  const msg = document.getElementById("cw-block-msg");
-  if (msg) msg.style.display = "block";
-};
 
   });
 })();
