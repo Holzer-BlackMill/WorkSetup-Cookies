@@ -162,14 +162,12 @@ function acceptAll() {
 
     window.manageCookies = showOverlay;
 
+    if (!localStorage.getItem(CONSENT_KEY)) showOverlay();
+
    window.showAffiliateBlockedMessage = function () {
   const msg = document.getElementById("cw-block-msg");
   if (msg) msg.style.display = "block";
 };
-
-
-    if (!localStorage.getItem(CONSENT_KEY)) showOverlay();
-
 
   });
 })();
