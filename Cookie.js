@@ -170,11 +170,6 @@ function acceptAll() {
 
     if (!localStorage.getItem(CONSENT_KEY)) showOverlay();
 
-   if (!state.affiliate) {
-    window.manageCookies && window.manageCookies();
-    window.showAffiliateBlockedMessage && window.showAffiliateBlockedMessage();
-    return;
-}
 
   });
 })();
