@@ -7,6 +7,12 @@
 
 
   /* ---------- HTML ---------- */
+
+<p id="cw-block-msg" style="display:none; font-size:13px; color:#b00020; margin-bottom:10px;">
+  Redirection was blocked because affiliate cookies are not enabled.
+</p>
+
+  
   const html = `
 <div id="cw-overlay">
   <div id="cw-box">
@@ -156,6 +162,19 @@ function acceptAll() {
 
     window.manageCookies = showOverlay;
 
+   window.showAffiliateBlockedMessage = function () {
+  const msg = document.getElementById("cw-block-msg");
+  if (msg) msg.style.display = "block";
+};
+
+
     if (!localStorage.getItem(CONSENT_KEY)) showOverlay();
+
+   if (!state.affiliate) {
+    window.manageCookies && window.manageCookies();
+    window.showAffiliateBlockedMessage && window.showAffiliateBlockedMessage();
+    return;
+}
+
   });
 })();
