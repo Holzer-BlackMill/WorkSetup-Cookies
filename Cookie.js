@@ -113,20 +113,29 @@
     }
 
     // Aktionen
-    function saveSettings() {
-      const state = {};
-      document.querySelectorAll("[data-cookie]").forEach(cb => state[cb.dataset.cookie] = cb.checked);
-      window.setCookieState(state);
-      hideOverlay();
-    }
+function saveSettings() {
+  const state = {};
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    state[cb.dataset.cookie] = cb.checked;
+  });
 
-    function acceptAll() {
-      const state = {};
-      document.querySelectorAll("[data-cookie]").forEach(cb => { cb.checked = true; state[cb.dataset.cookie] = true; });
-      window.setCookieState(state);
-      window.applyStateToUI();
-      hideOverlay();
-    }
+  window.setCookieState(state);
+  localStorage.setItem(CONSENT_KEY, "true"); // 🔴 WICHTIG
+  hideOverlay();
+}
+
+function acceptAll() {
+  const state = {};
+  document.querySelectorAll("[data-cookie]").forEach(cb => {
+    cb.checked = true;
+    state[cb.dataset.cookie] = true;
+  });
+
+  window.setCookieState(state);
+  localStorage.setItem(CONSENT_KEY, "true"); // 🔴 WICHTIG
+  hideOverlay();
+}
+
 
     function rejectAll() {
       const state = {};
