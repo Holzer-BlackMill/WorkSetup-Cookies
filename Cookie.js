@@ -184,5 +184,31 @@ window.clearAffiliateBlockedMessage = function () {
 
     if (!localStorage.getItem(CONSENT_KEY)) showOverlay();
 
+
+document.addEventListener("click", function (e) {
+  const link = e.target.closest("a");
+  if (!link) return;
+
+  const href = link.href || "";
+
+  // Affiliate-Link erkennen
+  const isAffiliate =
+    href.includes("tag=") ||
+    href.includes("amzn.to") ||
+    href.includes("amazon.");
+
+  if (!isAffiliate) return;
+
+  const state = window.getCookieState?.() || {};
+  if (state.affiliate === true) return;
+
+  // BLOCKIEREN
+  e.preventDefault();
+  e.stopPropagation();
+
+  // Meldung + Cookie-Wall
+  window.manageCookies?.();
+});
+
   });
 })();
