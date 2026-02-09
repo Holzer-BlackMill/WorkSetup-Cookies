@@ -22,7 +22,7 @@
       color:#b00020;
       margin-bottom:10px;
     ">
-      Redirection was blocked because affiliate cookies are not enabled.
+      Redirection was blocked because affiliate cookies are not enabled. Please enable affiliate cookies to continue.
     </p>
 
     <div id="cw-main">
@@ -119,6 +119,16 @@
   text-decoration: underline;
   font-size: 13px;
 }
+/* --- neue Version für schönere Auflistung --- */
+.cw-list label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 `;
 
   document.addEventListener("DOMContentLoaded", () => {
