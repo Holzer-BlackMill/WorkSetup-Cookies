@@ -1,22 +1,11 @@
-/* ========= SIMPLE COOKIE WALL – WORKSETUP ========= */
+
+/* ========= COOKIE WALL – WORKSETUP (CLEAN) ========= */
 (function () {
   const CONSENT_KEY = "cookieConsent_v1";
+  const STATE_KEY = "cookieState";
 
-  /* ---------- HELPERS ---------- */
   function qs(id) {
     return document.getElementById(id);
-  }
-
-  function saveConsent(data) {
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(data));
-  }
-
-  function getConsent() {
-    try {
-      return JSON.parse(localStorage.getItem(CONSENT_KEY));
-    } catch {
-      return null;
-    }
   }
 
   function blockPage(block) {
@@ -25,10 +14,18 @@
 
   /* ---------- HTML ---------- */
   const html = `
-<div id="cw-overlay">
+<div id="cw-overlay" style="display:none;">
   <div id="cw-box">
 
-    <!-- LAYER 1 -->
+    <p id="cw-affiliate-blocked" style="
+      display:none;
+      font-size:13px;
+      color:#b00020;
+      margin-bottom:10px;
+    ">
+      Redirection was blocked because affiliate cookies are not enabled. Please enable affiliate cookies to continue.
+    </p>
+
     <div id="cw-main">
       <h2>Privacy & Cookies</h2>
       <p>
@@ -44,7 +41,6 @@
       </div>
     </div>
 
-    <!-- LAYER 2 -->
     <div id="cw-settings-layer" style="display:none;">
       <div class="cw-header">
         <h2>Cookie Settings</h2>
@@ -58,15 +54,12 @@
         </label>
 
         <label>
-          <input type="checkbox" id="c-affiliate" checked>
+          <input type="checkbox" data-cookie="affiliate">
           Affiliate tracking cookies
         </label>
 
-        <label>
-          <input type="checkbox" id="c-analytics" checked>
-          Analytics cookies
-        </label>
-      </div>
+
+
 
       <div class="cw-actions">
         <button id="cw-save" class="cw-btn gray">Save</button>
@@ -84,85 +77,58 @@
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.75);
-  display: none;
-  align-items: center;
+  display: flex;
   justify-content: center;
+  align-items: center;
   z-index: 999999;
   font-family: Arial, sans-serif;
 }
-
 #cw-box {
-  background: #fff;
+  background: white;
   width: 100%;
   max-width: 420px;
   border-radius: 12px;
   padding: 24px;
 }
-
-#cw-box h2 {
-  margin: 0 0 10px;
-  font-size: 20px;
-}
-
-#cw-box p {
-  font-size: 14px;
-  color: #444;
-}
-
-#cw-box a {
-  color: #0070f3;
-  text-decoration: underline;
-}
-
 .cw-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
-
 .cw-btn {
   padding: 10px 18px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  font-size: 14px;
 }
-
 .cw-btn.blue {
   background: #0070f3;
-  color: #fff;
+  color: white;
 }
-
 .cw-btn.gray {
   background: #e5e5e5;
-  color: #111;
 }
-
 .cw-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
-
 #cw-reject-all {
-  font-size: 13px;
-  color: #777;
-  text-decoration: underline;
   cursor: pointer;
+  text-decoration: underline;
+  font-size: 13px;
 }
-
-.cw-list {
-  margin-top: 15px;
-}
-
+/* --- neue Version für schönere Auflistung --- */
 .cw-list label {
-  display: block;
-  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
   font-size: 14px;
+  line-height: 1.4;
 }
+
 `;
 
-  /* ---------- INSERT ---------- */
   document.addEventListener("DOMContentLoaded", () => {
     document.body.insertAdjacentHTML("beforeend", html);
     const style = document.createElement("style");
@@ -172,110 +138,103 @@
     const overlay = qs("cw-overlay");
     const main = qs("cw-main");
     const settings = qs("cw-settings-layer");
+    const affiliateMsg = qs("cw-affiliate-blocked");
 
-    function show() {
-      overlay.style.display = "flex";
-      blockPage(true);
+    /* ---------- STATE ---------- */
+    function getState() {
+      return JSON.parse(localStorage.getItem(STATE_KEY)) || {
+        affiliate: false,
+        analytics: false,
+      };
     }
 
-    function hide() {
+    function setState(state) {
+      localStorage.setItem(STATE_KEY, JSON.stringify(state));
+      applyStateToUI();
+    }
+
+    function applyStateToUI() {
+      const state = getState();
+      document.querySelectorAll("[data-cookie]").forEach(cb => {
+        cb.checked = state[cb.dataset.cookie] === true;
+      });
+    }
+
+    /* ---------- OVERLAY ---------- */
+    function showOverlay(mode = "normal") {
+      overlay.style.display = "flex";
+      blockPage(mode === "block");
+      affiliateMsg.style.display = mode === "block" ? "block" : "none";
+      main.style.display = "block";
+      settings.style.display = "none";
+      applyStateToUI();
+    }
+
+    function hideOverlay() {
       overlay.style.display = "none";
       blockPage(false);
     }
 
-function getCookieState() {
-  try {
-    return JSON.parse(localStorage.getItem("cookieState")) || {}
-  } catch {
-    return {}
-  }
-}
+    window.manageCookies = () => showOverlay("normal");
 
-    
-function acceptAll() {
-  const state = {}
-
-  document.querySelectorAll("[data-cookie]").forEach(cb => {
-    cb.checked = true
-    state[cb.dataset.cookie] = true
-  })
-
-  setCookieState(state)
-  applyStateToUI()
-  hideOverlay()
-}
-
-
-
-    function saveCustom() {
-      saveConsent({
-        essential: true,
-        affiliate: qs("c-affiliate").checked,
-        analytics: qs("c-analytics").checked,
-      });
-      hide();
-    }
-
-function rejectAll() {
-  const state = {}
-
-  document.querySelectorAll("[data-cookie]").forEach(cb => {
-    cb.checked = false
-    state[cb.dataset.cookie] = false
-  })
-
-  setCookieState(state)
-  applyStateToUI()
-}
-
-
-    
-function saveSettings() {
-  const state = {}
-
-  document.querySelectorAll("[data-cookie]").forEach(cb => {
-    state[cb.dataset.cookie] = cb.checked
-  })
-
-  setCookieState(state)
-  hideOverlay()
-}
-
-
-
-    
-function applyStateToUI() {
-  const state = getCookieState()
-
-  document.querySelectorAll("[data-cookie]").forEach(cb => {
-    cb.checked = state[cb.dataset.cookie] === true
-  })
-}
-
-
-window.manageCookies = function () {
-  showOverlay()
-  applyStateToUI()
-}
-
-
-    
-
-    /* EVENTS */
-    qs("cw-accept").onclick = acceptAll;
+    /* ---------- ACTIONS ---------- */
     qs("cw-settings").onclick = () => {
       main.style.display = "none";
       settings.style.display = "block";
-      applyStateToUI();
     };
-    qs("cw-save").onclick = saveCustom;
-    qs("cw-accept-all").onclick = acceptAll;
-    qs("cw-reject-all").onclick = rejectAll;
 
-    /* PUBLIC */
-    window.manageCookies = show;
+    qs("cw-accept").onclick = () => {
+      setState({ affiliate: true, analytics: true });
+      localStorage.setItem(CONSENT_KEY, "true");
+      hideOverlay();
+    };
 
-    /* INIT */
-    if (!getConsent()) show();
+    qs("cw-accept-all").onclick = qs("cw-accept").onclick;
+
+    qs("cw-save").onclick = () => {
+      const state = {};
+      document.querySelectorAll("[data-cookie]").forEach(cb => {
+        state[cb.dataset.cookie] = cb.checked;
+      });
+      setState(state);
+      localStorage.setItem(CONSENT_KEY, "true");
+      hideOverlay();
+    };
+
+    qs("cw-reject-all").onclick = () => {
+      setState({ affiliate: false, analytics: false });
+      localStorage.setItem(CONSENT_KEY, "true");
+      hideOverlay();
+    };
+
+    /* ---------- AFFILIATE LINK BLOCK ---------- */
+    document.addEventListener("click", function (e) {
+      const a = e.target.closest("a");
+      if (!a) return;
+
+      const href = a.href || "";
+      const isAffiliate =
+        href.includes("amazon.") ||
+        href.includes("amzn.to") ||
+        href.includes("tag=");
+
+      if (!isAffiliate) return;
+
+      const state = getState();
+      if (state.affiliate === true) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      showOverlay("block");
+    });
+
+    /* ---------- INITIAL ---------- */
+    if (!localStorage.getItem(STATE_KEY)) {
+      setState({ affiliate: false, analytics: false });
+    }
+
+    if (!localStorage.getItem(CONSENT_KEY)) {
+      showOverlay("normal");
+    }
   });
 })();
